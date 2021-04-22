@@ -24,17 +24,41 @@ definitions for any souls to be instantiated
 
 class qnutrient():
     def __init__(self,x,y):
+        x = x
+        y = y
         energy = 1.0
-        fitness = 1.0 / randint()
+        density = 1.0
+        fitness = 1.0 / random.randint()
         magic_color = randint(0x0,0xFF), randint(0x0,0xFF), randint(0x0,0xFF)
     
-    update():
+    def updateEnergy(self):
         energy = energy + fitness
         
-        return true
 
 class bloop():
-    def
+    def __init__(self,x,y):
+        x = x
+        y = y
+        energy = 2.0
+        density = 0.5
+        fitness = 1.0
+        speed = 0, 0
+        magic_color  = randint(0x0,0xFF), randint(0x0,0xFF), randint(0x0,0xFF)
+
+    def die(self):
+        print("oops")
+
+    def updateSpeed(self,x,y):
+        speed[0] = speed[0] + x
+        speed[1] = speed[1] + y
+        energy = energy - fitness
+
+    def updateEnergy(self, amount):
+        energy = energy + amount
+        if energy <= 0:
+            self.die()
+            
+
 
 """#
 #Instantiation Phase
@@ -85,6 +109,8 @@ while True:
     #Initialization Phase
     all scope specific variables here
     #"""
+    if(len(nutrients) < minNutrients):
+        nutrients.append(qnutrient(randint(0,windowWidth), randint(0,windowHeight)))
 
     #instantiation
 
@@ -141,7 +167,7 @@ while True:
     #"""
     window.fill(black_color)
 
-    for qn in nutrients
+    for qn in nutrients:
         pygame.draw.circle(window, (0,0,0), (400, 300), 100, 5)
 
 
