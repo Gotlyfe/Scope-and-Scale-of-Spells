@@ -24,38 +24,40 @@ definitions for any souls to be instantiated
 
 class qnutrient():
     def __init__(self,x,y):
-        x = x
-        y = y
-        energy = 1.0
-        density = 1.0
-        fitness = 1.0 / random.randint()
-        magic_color = randint(0x0,0xFF), randint(0x0,0xFF), randint(0x0,0xFF)
+        self.x = x
+        self.y = y
+        self.energy = 1.0
+        self.density = 1.0
+        self.fitness = 1.0 / random.randint(1, 100)
+        self.magic_color = random.randint(0x0,0xFF), random.randint(0x0,0xFF), random.randint(0x0,0xFF)
     
     def updateEnergy(self):
-        energy = energy + fitness
+        self.energy = self.energy + self.fitness
+
+    def updatePosition(self,x,y):
+        self.x = self.x + x
+        self.y = self.y + y
+
         
 
 class bloop():
-    def __init__(self,x,y):
-        x = x
-        y = y
-        energy = 2.0
-        density = 0.5
-        fitness = 1.0
-        speed = 0, 0
-        magic_color  = randint(0x0,0xFF), randint(0x0,0xFF), randint(0x0,0xFF)
+    def __init__(self):
+        self.energy = 20.0
+        self.density = 0.5
+        self.fitness = 1.0
+        self.speed = 0, 0
+        self.magic_color  = random.randint(0x0,0xFF), random.randint(0x0,0xFF), random.randint(0x0,0xFF)
 
     def die(self):
-        print("oops")
+        print("oops, you died")
 
     def updateSpeed(self,x,y):
-        speed[0] = speed[0] + x
-        speed[1] = speed[1] + y
-        energy = energy - fitness
+        self.speed = (self.speed[0] + x, self.speed[1] + y)
+        self.updateEnergy(- self.fitness)
 
     def updateEnergy(self, amount):
-        energy = energy + amount
-        if energy <= 0:
+        self.energy = self.energy + amount
+        if self.energy <= 0:
             self.die()
             
 
@@ -80,8 +82,17 @@ green_color = 0x69, 0x7A, 0x21
 
 #QNutrients
 nutrients = []
-maxNutrients = 100
+maxNutrients = 1000
 minNutrients = 10
+
+
+#Player
+player = bloop()
+playerSpeed = 1
+
+#effects
+flicker = False
+
 
 """#
 #Pre-Calculative Phase
@@ -109,9 +120,10 @@ while True:
     #Initialization Phase
     all scope specific variables here
     #"""
-    if(len(nutrients) < minNutrients):
-        nutrients.append(qnutrient(randint(0,windowWidth), randint(0,windowHeight)))
+    if(len(nutrients) < maxNutrients):
+        nutrients.append(qnutrient(random.randint(0,windowWidth), random.randint(0,windowHeight)))
 
+    
     #instantiation
 
     """#
@@ -133,13 +145,13 @@ while True:
             if event.type == pygame.KEYDOWN:    #   Checking for keypress
                 #   if game window is focused, touched the ground recently, and key is pressed, move amount
                 if (pygame.key.get_pressed()[pygame.K_UP] or pygame.key.get_pressed()[pygame.K_w]): 
-                    pass
+                    player.updateSpeed(0, - playerSpeed)
                 if (pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[pygame.K_a]):
-                    pass
+                    player.updateSpeed(- playerSpeed, 0)
                 if (pygame.key.get_pressed()[pygame.K_DOWN] or pygame.key.get_pressed()[pygame.K_s]): 
-                    pass
+                    player.updateSpeed(0, playerSpeed)
                 if (pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_d]):
-                    pass
+                    player.updateSpeed(playerSpeed, 0)
             elif event.type == pygame.KEYUP:
                 if (not pygame.key.get_pressed()[pygame.K_UP] and not pygame.key.get_pressed()[pygame.K_w]): 
                     pass
@@ -165,11 +177,20 @@ while True:
     """#
     #Draw Phase
     #"""
-    window.fill(black_color)
+    if(flicker):
+        window.fill(black_color)
+        flicker = False
+    else:
+        flicker = True
 
     for qn in nutrients:
-        pygame.draw.circle(window, (0,0,0), (400, 300), 100, 5)
+        qn.updatePosition(- player.speed[0], - player.speed[1])
+        if not (qn.y > windowHeight * 2 or qn.y < windowHeight * -2 or qn.x > windowWidth * 2 or qn.x < windowWidth * -2):
+            pygame.draw.circle(window, qn.magic_color, (qn.x, qn.y), qn.energy)
+        else:
+            nutrients.remove(qn)
 
+        pygame.draw.circle(window, player.magic_color, (windowWidth // 2, windowHeight // 2), player.energy)
 
     pygame.display.flip()
     """#
@@ -177,3 +198,4 @@ while True:
     #"""
 
     #variable clean up
+    pygame.time.wait(40)
